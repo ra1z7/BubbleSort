@@ -23,7 +23,7 @@ struct ColoredNumber: View, Identifiable {
 }
 
 struct ContentView: View {
-    @State private var numbersToSort = [7, 2, 9, 1, 8, 3, 5, 4, 6]
+    @State private var numbersToSort = [Int]()
     @State private var sortingState = ""
     @State private var playEffect = false
     
@@ -51,35 +51,73 @@ struct ContentView: View {
                 ForEach(numbersToSort, id: \.self) { number in
                     ColoredNumber(number: number)
                 }
+                
+                if sortingState != "Sorting..." {
+                    Button {
+                        print("Plus")
+                    } label: {
+                        Image(systemName: "plus")
+                            .font(.system(size: 12, weight: .semibold))
+                            .frame(width: 20, height: 20)
+                            .padding(10)
+                            .background(.red)
+                            .foregroundStyle(.white)
+                            .clipShape(.rect(cornerRadius: 15))
+                    }
+                    .animation(.bouncy, value: sortingState)
+                    .transition(.scale)
+                }
+                
+                if numbersToSort.isEmpty {
+                    Button {
+                        withAnimation {
+                            numbersToSort = [7, 2, 9, 1, 8, 3, 5, 4, 6]
+                        }
+                    } label: {
+                        Text("Add Samples")
+                            .frame(width: 86, height: 20)
+                            .padding(10)
+                            .background(.secondary.opacity(0.2))
+                            .foregroundStyle(.black)
+                            .clipShape(.rect(cornerRadius: 15))
+                            .font(.system(size: 12, design: .monospaced))
+                    }
+                }
             }
             
             HStack {
                 Button("Sort") {
-                    Task {
-                        sortingState = "Sorting..."
-                        var allNumbersSorted = false
-                        
-                        while !allNumbersSorted {
-                            var sortedCount = 0
-                            
-                            for i in 0..<numbersToSort.count - 1 {
-                                if numbersToSort[i] < numbersToSort[i + 1] {
-                                    sortedCount += 1
-                                    continue
-                                } else {
-                                    let temp = numbersToSort[i]
-                                    withAnimation {
-                                        numbersToSort[i] = numbersToSort[i + 1]
-                                        numbersToSort[i + 1] = temp
-                                    }
-                                    
-                                    try? await Task.sleep(for: .seconds(0.5))
-                                }
+                    if numbersToSort.count > 1 {
+                        Task {
+                            withAnimation {
+                                sortingState = "Sorting..."
                             }
+                            var allNumbersSorted = false
                             
-                            if sortedCount == numbersToSort.count - 1 {
-                                sortingState = "Sorting Complete"
-                                allNumbersSorted = true
+                            while !allNumbersSorted {
+                                var sortedCount = 0
+                                
+                                for i in 0..<numbersToSort.count - 1 {
+                                    if numbersToSort[i] < numbersToSort[i + 1] {
+                                        sortedCount += 1
+                                        continue
+                                    } else {
+                                        let temp = numbersToSort[i]
+                                        withAnimation {
+                                            numbersToSort[i] = numbersToSort[i + 1]
+                                            numbersToSort[i + 1] = temp
+                                        }
+                                        
+                                        try? await Task.sleep(for: .seconds(0.5))
+                                    }
+                                }
+                                
+                                if sortedCount == numbersToSort.count - 1 {
+                                    withAnimation {
+                                        sortingState = "Sorting Complete"
+                                    }
+                                    allNumbersSorted = true
+                                }
                             }
                         }
                     }
