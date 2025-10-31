@@ -82,6 +82,7 @@ struct ContentView: View {
                             .clipShape(.rect(cornerRadius: 15))
                             .font(.system(size: 12, design: .monospaced))
                     }
+                    .transition(.blurReplace)
                 }
             }
             
@@ -133,6 +134,20 @@ struct ContentView: View {
                 }
                 .buttonStyle(.bordered)
                 .tint(.secondary)
+                
+                if !numbersToSort.isEmpty {
+                    Button {
+                        withAnimation {
+                            sortingState = ""
+                            numbersToSort.removeAll()
+                        }
+                    } label: {
+                        Image(systemName: "trash.fill")
+                    }
+                    .buttonStyle(.bordered)
+                    .tint(.red)
+                    .transition(.scale)
+                }
             }
             .padding()
             .fontDesign(.monospaced)
