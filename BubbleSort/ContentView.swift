@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct ColoredNumber: View, Identifiable {
+struct NumBox: View, Identifiable {
     let id = UUID()
     let number: Int
     
@@ -50,7 +50,7 @@ struct ContentView: View {
             
             HStack {
                 ForEach(numbersToSort, id: \.self) { number in
-                    ColoredNumber(number: number)
+                    NumBox(number: number)
                 }
                 .animation(.bouncy, value: numbersToSort)
                 
@@ -126,6 +126,7 @@ struct ContentView: View {
                             }
                         }
                     }
+                    .buttonBorderShape(.capsule)
                     .buttonStyle(.borderedProminent)
                     .tint(.primary)
                     .transition(.blurReplace)
@@ -136,6 +137,7 @@ struct ContentView: View {
                             numbersToSort.shuffle()
                         }
                     }
+                    .buttonBorderShape(.capsule)
                     .buttonStyle(.bordered)
                     .tint(.secondary)
                     .transition(.blurReplace)
@@ -158,6 +160,7 @@ struct ContentView: View {
                             .frame(width: 10, height: 20)
                             .contentTransition(.symbolEffect(.replace))
                     }
+                    .buttonBorderShape(.circle)
                     .buttonStyle(.bordered)
                     .tint(.red)
                     .transition(.scale.combined(with: .blurReplace))
