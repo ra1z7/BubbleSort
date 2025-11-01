@@ -26,6 +26,7 @@ struct ContentView: View {
     @State private var numbersToSort = [Int]()
     @State private var sortingState = ""
     @State private var playEffect = false
+    @State private var allNumbersSorted = false
     
     var body: some View {
         VStack {
@@ -87,62 +88,74 @@ struct ContentView: View {
             }
             
             HStack {
-                Button("Sort") {
-                    if numbersToSort.count > 1 {
-                        Task {
-                            withAnimation {
-                                sortingState = "Sorting..."
-                            }
-                            var allNumbersSorted = false
-                            
-                            while !allNumbersSorted {
-                                var sortedCount = 0
-                                
-                                for i in 0..<numbersToSort.count - 1 {
-                                    if numbersToSort[i] < numbersToSort[i + 1] {
-                                        sortedCount += 1
-                                        continue
-                                    } else {
-                                        let temp = numbersToSort[i]
-                                        withAnimation {
-                                            numbersToSort[i] = numbersToSort[i + 1]
-                                            numbersToSort[i + 1] = temp
-                                        }
-                                        
-                                        try? await Task.sleep(for: .seconds(0.5))
-                                    }
+                if sortingState != "Sorting..." {
+                    Button("Sort") {
+                        if numbersToSort.count > 1 {
+                            Task {
+                                withAnimation {
+                                    sortingState = "Sorting..."
+                                    allNumbersSorted = false
                                 }
                                 
-                                if sortedCount == numbersToSort.count - 1 {
-                                    withAnimation {
-                                        sortingState = "Sorting Complete"
+                                while !allNumbersSorted {
+                                    var sortedCount = 0
+                                    
+                                    for i in 0..<numbersToSort.count - 1 {
+                                        if numbersToSort[i] < numbersToSort[i + 1] {
+                                            sortedCount += 1
+                                            continue
+                                        } else {
+                                            let temp = numbersToSort[i]
+                                            withAnimation {
+                                                numbersToSort[i] = numbersToSort[i + 1]
+                                                numbersToSort[i + 1] = temp
+                                            }
+                                            
+                                            try? await Task.sleep(for: .seconds(0.5))
+                                        }
                                     }
-                                    allNumbersSorted = true
+                                    
+                                    if sortedCount == numbersToSort.count - 1 {
+                                        withAnimation {
+                                            sortingState = "Sorting Complete"
+                                        }
+                                        allNumbersSorted = true
+                                    }
                                 }
                             }
                         }
                     }
-                }
-                .buttonStyle(.borderedProminent)
-                .tint(.primary)
-                
-                Button("Shuffle") {
-                    withAnimation {
-                        sortingState = ""
-                        numbersToSort.shuffle()
+                    .buttonStyle(.borderedProminent)
+                    .tint(.primary)
+                    .transition(.blurReplace)
+                    
+                    Button("Shuffle") {
+                        withAnimation {
+                            sortingState = ""
+                            numbersToSort.shuffle()
+                        }
                     }
+                    .buttonStyle(.bordered)
+                    .tint(.secondary)
+                    .transition(.blurReplace)
                 }
-                .buttonStyle(.bordered)
-                .tint(.secondary)
                 
                 if !numbersToSort.isEmpty {
                     Button {
                         withAnimation {
+                            if sortingState == "Sorting..." {
+                                allNumbersSorted = true
+                                sortingState = ""
+                                return
+                            }
                             sortingState = ""
                             numbersToSort.removeAll()
                         }
                     } label: {
-                        Image(systemName: "trash.fill")
+                        Image(systemName: sortingState == "Sorting..." ? "xmark" : "trash.fill")
+                            .imageScale(.small)
+                            .frame(width: 10, height: 20)
+                            .contentTransition(.symbolEffect(.replace))
                     }
                     .buttonStyle(.bordered)
                     .tint(.red)
