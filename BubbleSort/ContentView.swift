@@ -15,8 +15,8 @@ struct ColoredNumber: View, Identifiable {
         Text("\(number)")
             .frame(width: 20, height: 20)
             .padding(10)
-            .background(.secondary.opacity(0.2))
-            .foregroundStyle(.primary)
+            .background(Color(red: 0.94, green: 0.94, blue: 0.94))
+            .foregroundStyle(.black)
             .clipShape(.rect(cornerRadius: 15))
             .font(.system(size: 12, weight: .semibold, design: .monospaced))
     }
@@ -52,6 +52,7 @@ struct ContentView: View {
                 ForEach(numbersToSort, id: \.self) { number in
                     ColoredNumber(number: number)
                 }
+                .animation(.bouncy, value: numbersToSort)
                 
                 if sortingState != "Sorting..." {
                     Button {
@@ -79,7 +80,7 @@ struct ContentView: View {
                             .frame(width: 86, height: 20)
                             .padding(10)
                             .background(.secondary.opacity(0.2))
-                            .foregroundStyle(.black)
+                            .foregroundStyle(.gray)
                             .clipShape(.rect(cornerRadius: 15))
                             .font(.system(size: 12, design: .monospaced))
                     }
@@ -88,7 +89,7 @@ struct ContentView: View {
             }
             
             HStack {
-                if sortingState != "Sorting..." {
+                if sortingState != "Sorting..." && !numbersToSort.isEmpty {
                     Button("Sort") {
                         if numbersToSort.count > 1 {
                             Task {
@@ -159,9 +160,10 @@ struct ContentView: View {
                     }
                     .buttonStyle(.bordered)
                     .tint(.red)
-                    .transition(.scale)
+                    .transition(.scale.combined(with: .blurReplace))
                 }
             }
+            .frame(width: 220, height: 35)
             .padding()
             .fontDesign(.monospaced)
         }
