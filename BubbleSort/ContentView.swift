@@ -56,7 +56,15 @@ struct ContentView: View {
                 
                 if sortingState != "Sorting..." {
                     Button {
-                        print("Plus")
+                        while true {
+                            let randomNumber = Int.random(in: 0..<100)
+                            if !numbersToSort.contains(randomNumber) {
+                                withAnimation {
+                                    numbersToSort.append(randomNumber)
+                                }
+                                break
+                            }
+                        }
                     } label: {
                         Image(systemName: "plus")
                             .font(.system(size: 12, weight: .semibold))
