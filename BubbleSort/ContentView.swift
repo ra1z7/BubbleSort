@@ -25,20 +25,31 @@ struct NumBox: View, Identifiable {
 struct ContentView: View {
     @State private var numbersToSort = [Int]()
     @State private var sortingState = ""
-    @State private var playEffect = false
     @State private var allNumbersSorted = false
+    @State private var showingSettings = false
     
     var body: some View {
         VStack {
             HStack {
                 Spacer()
                 
-                Image(systemName: "gearshape.fill")
-                    .imageScale(.large)
-                    .symbolEffect(.wiggle, value: playEffect)
+                Image(systemName: showingSettings ? "arrow.right" : "gearshape.fill")
+                    .resizable()
+                    .scaledToFill()
+                    .frame(width: 16, height: 16)
+                    .contentTransition(.symbolEffect(.replace))
                     .onTapGesture {
-                        playEffect.toggle() // triggers the animation once
+                        withAnimation {
+                            showingSettings.toggle()
+                        }
                     }
+                
+                if showingSettings {
+                    RoundedRectangle(cornerRadius: 10)
+                        .fill(.secondary.opacity(0.1))
+                        .frame(width: 300, height: 50)
+                        .transition(.blurReplace)
+                }
             }
             
             Text(sortingState)
