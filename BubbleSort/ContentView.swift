@@ -126,7 +126,7 @@ struct ContentView: View {
                                                     numbersToSort[i + 1] = temp
                                                 }
                                                 
-                                                try? await Task.sleep(for: .seconds(sortingSpeed))
+                                                try? await Task.sleep(for: .seconds(1.1 - sortingSpeed))
                                             }
                                         }
                                         
@@ -198,12 +198,12 @@ struct ContentView: View {
                     VStack {
                         Text("Adjust Sorting Speed")
                         
-                        Slider(value: $sortingSpeed, in: 0.1...1, step: 0.1) {
+                        Slider(value: $sortingSpeed, in: 0.1...1.0, step: 0.1) {
                             Text("Adjust Sorting Speed")
                         } minimumValueLabel: {
-                            Text("5x")
-                        } maximumValueLabel: {
                             Text("1x")
+                        } maximumValueLabel: {
+                            Text("5x")
                         }
                         .frame(width: 250)
                     }
