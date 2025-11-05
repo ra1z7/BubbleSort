@@ -34,7 +34,7 @@ struct ContentView: View {
             Spacer()
             
             Image(systemName: showingSettings ? "xmark" : "gearshape.fill")
-                .frame(width: 16, height: 16)
+                .imageScale(.large)
                 .contentTransition(.symbolEffect(.replace))
                 .onTapGesture {
                     withAnimation {
