@@ -43,8 +43,7 @@ struct ContentView: View {
                 }
         }
         
-        HStack {
-            Spacer()
+        ZStack {
             VStack {
                 Text(sortingState)
                     .font(.system(size: 16, design: .monospaced))
@@ -101,6 +100,7 @@ struct ContentView: View {
                         .transition(.blurReplace)
                     }
                 }
+                .disabled(showingSettings)
                 
                 HStack {
                     if sortingState != "Sorting..." && !numbersToSort.isEmpty {
@@ -183,17 +183,17 @@ struct ContentView: View {
                 .frame(width: 220, height: 35)
                 .padding()
                 .fontDesign(.monospaced)
+                .disabled(showingSettings)
             }
-            .blur(radius: showingSettings ? 5 : 0)
-            
-            Spacer()
+            .blur(radius: showingSettings ? 20 : 0)
             
             if showingSettings {
                 ZStack {
                     RoundedRectangle(cornerRadius: 15)
-                        .fill(.secondary.opacity(0.1))
+                        .fill(.thinMaterial)
                         .frame(width: 300, height: 90)
                         .transition(.blurReplace)
+                        .shadow(radius: 6)
                     
                     VStack {
                         Text("Adjust Sorting Speed")
@@ -211,7 +211,6 @@ struct ContentView: View {
                     .foregroundStyle(.secondary)
                 }
                 .transition(.blurReplace)
-                .padding()
             }
         }
     }
