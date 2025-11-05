@@ -63,7 +63,7 @@ struct ContentView: View {
                         Button {
                             while true {
                                 let randomNumber = Int.random(in: 0..<100)
-                                if !numbersToSort.contains(randomNumber) {
+                                if !numbersToSort.contains(randomNumber) && numbersToSort.count < 15 {
                                     withAnimation {
                                         numbersToSort.append(randomNumber)
                                     }
@@ -75,12 +75,13 @@ struct ContentView: View {
                                 .font(.system(size: 12, weight: .semibold))
                                 .frame(width: 20, height: 20)
                                 .padding(10)
-                                .background(.red)
+                                .background(numbersToSort.count == 15 ? Color.secondary.opacity(0.2) : Color.red)
                                 .foregroundStyle(.white)
                                 .clipShape(.rect(cornerRadius: 15))
                         }
                         .animation(.bouncy, value: sortingState)
                         .transition(.scale)
+                        .disabled(numbersToSort.count == 15)
                     }
                     
                     if numbersToSort.isEmpty {
