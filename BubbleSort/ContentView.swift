@@ -28,19 +28,23 @@ struct ContentView: View {
     @State private var allNumbersSorted = false
     @State private var showingSettings = false
     @State private var sortingSpeed = 0.5
+    @State private var hapticTrigger = false
     
     var body: some View {
         HStack {
             Spacer()
             
-            Image(systemName: showingSettings ? "xmark" : "gearshape.fill")
-                .imageScale(.large)
-                .contentTransition(.symbolEffect(.replace))
-                .onTapGesture {
-                    withAnimation {
-                        showingSettings.toggle()
-                    }
+            Button {
+                withAnimation {
+                    showingSettings.toggle()
+                    hapticTrigger.toggle()
                 }
+            } label: {
+                Image(systemName: showingSettings ? "xmark" : "gearshape.fill")
+                    .foregroundStyle(.black)
+                    .contentTransition(.symbolEffect(.replace))
+            }
+            .sensoryFeedback(.impact(flexibility: .soft), trigger: hapticTrigger)
         }
         
         ZStack {
@@ -57,6 +61,7 @@ struct ContentView: View {
                         NumBox(number: number)
                     }
                     .animation(.bouncy, value: numbersToSort)
+                    .sensoryFeedback(.impact(flexibility: .soft), trigger: numbersToSort)
                     
                     if sortingState != "Sorting..." {
                         Button {
@@ -65,6 +70,7 @@ struct ContentView: View {
                                 if !numbersToSort.contains(randomNumber) && numbersToSort.count < 15 {
                                     withAnimation {
                                         numbersToSort.append(randomNumber)
+                                        hapticTrigger.toggle()
                                     }
                                     break
                                 }
@@ -81,12 +87,17 @@ struct ContentView: View {
                         .animation(.bouncy, value: sortingState)
                         .transition(.scale)
                         .disabled(numbersToSort.count == 15)
+                        .sensoryFeedback(.impact(flexibility: .soft), trigger: hapticTrigger)
                     }
                     
                     if numbersToSort.isEmpty {
                         Button {
                             withAnimation {
-                                numbersToSort = [7, 2, 9, 1, 8, 3, 5, 4, 6]
+                                let randomOrder = [7, 2, 9, 1, 8, 3, 5, 4, 6]
+                                for number in randomOrder {
+                                    numbersToSort.append(number)
+                                    hapticTrigger.toggle()
+                                }
                             }
                         } label: {
                             Text("Add Samples")
@@ -98,6 +109,7 @@ struct ContentView: View {
                                 .font(.system(size: 12, design: .monospaced))
                         }
                         .transition(.blurReplace)
+                        .sensoryFeedback(.impact(flexibility: .soft), trigger: hapticTrigger)
                     }
                 }
                 .disabled(showingSettings)
@@ -110,6 +122,7 @@ struct ContentView: View {
                                     withAnimation {
                                         sortingState = "Sorting..."
                                         allNumbersSorted = false
+                                        hapticTrigger.toggle()
                                     }
                                     
                                     while !allNumbersSorted {
@@ -134,6 +147,7 @@ struct ContentView: View {
                                             withAnimation {
                                                 sortingState = "Sorting Complete"
                                             }
+                                            try? await Task.sleep(for: .seconds(0.5))
                                             allNumbersSorted = true
                                         }
                                     }
@@ -144,17 +158,21 @@ struct ContentView: View {
                         .buttonStyle(.borderedProminent)
                         .tint(.primary)
                         .transition(.blurReplace)
+                        .sensoryFeedback(.start, trigger: hapticTrigger)
+                        .sensoryFeedback(.success, trigger: allNumbersSorted)
                         
                         Button("Shuffle") {
                             withAnimation {
                                 sortingState = ""
                                 numbersToSort.shuffle()
+                                hapticTrigger.toggle()
                             }
                         }
                         .buttonBorderShape(.capsule)
                         .buttonStyle(.bordered)
                         .tint(.secondary)
                         .transition(.blurReplace)
+                        .sensoryFeedback(.impact(flexibility: .soft), trigger: hapticTrigger)
                     }
                     
                     if !numbersToSort.isEmpty {
@@ -167,6 +185,7 @@ struct ContentView: View {
                                 }
                                 sortingState = ""
                                 numbersToSort.removeAll()
+                                hapticTrigger.toggle()
                             }
                         } label: {
                             Image(systemName: sortingState == "Sorting..." ? "xmark" : "trash.fill")
@@ -178,6 +197,7 @@ struct ContentView: View {
                         .buttonStyle(.bordered)
                         .tint(.red)
                         .transition(.scale.combined(with: .blurReplace))
+                        .sensoryFeedback(.stop, trigger: hapticTrigger)
                     }
                 }
                 .frame(width: 220, height: 35)
@@ -206,6 +226,7 @@ struct ContentView: View {
                             Text("5x")
                         }
                         .frame(width: 250)
+                        .sensoryFeedback(.selection, trigger: sortingSpeed)
                     }
                     .font(.system(size: 12, design: .monospaced))
                     .foregroundStyle(.secondary)
