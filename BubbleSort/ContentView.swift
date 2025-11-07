@@ -13,18 +13,25 @@ struct NumBox: View, Identifiable {
     
     var body: some View {
         Text("\(number)")
+            .font(.system(size: 12, weight: .semibold, design: .monospaced))
+            .foregroundStyle(.black)
             .frame(width: 20, height: 20)
             .padding(10)
             .background(Color(red: 0.94, green: 0.94, blue: 0.94))
-            .foregroundStyle(.black)
             .clipShape(.rect(cornerRadius: 15))
-            .font(.system(size: 12, weight: .semibold, design: .monospaced))
     }
 }
 
 struct ContentView: View {
     @State private var numbersToSort = [Int]()
-    @State private var sortingState = ""
+    
+    enum SortingState: String {
+        case sorting = "Sorting..."
+        case completed = "Sorting Complete"
+        case idle = ""
+    }
+    
+    @State private var sortingState = SortingState.idle
     @State private var allNumbersSorted = false
     @State private var showingSettings = false
     @State private var sortingSpeed = 0.5
@@ -49,7 +56,7 @@ struct ContentView: View {
         
         ZStack {
             VStack {
-                Text(sortingState)
+                Text(sortingState.rawValue)
                     .font(.system(size: 16, design: .monospaced))
                     .foregroundStyle(.secondary)
                     .frame(width: 170, height: 50)
@@ -63,7 +70,7 @@ struct ContentView: View {
                     .animation(.bouncy, value: numbersToSort)
                     .sensoryFeedback(.impact(flexibility: .soft), trigger: numbersToSort)
                     
-                    if sortingState != "Sorting..." {
+                    if sortingState != .sorting {
                         Button {
                             while true {
                                 let randomNumber = Int.random(in: 0..<100)
@@ -115,12 +122,12 @@ struct ContentView: View {
                 .disabled(showingSettings)
                 
                 HStack {
-                    if sortingState != "Sorting..." && !numbersToSort.isEmpty {
+                    if sortingState != .sorting && !numbersToSort.isEmpty {
                         Button("Sort") {
                             if numbersToSort.count > 1 {
                                 Task {
                                     withAnimation {
-                                        sortingState = "Sorting..."
+                                        sortingState = .sorting
                                         allNumbersSorted = false
                                         hapticTrigger.toggle()
                                     }
@@ -145,7 +152,7 @@ struct ContentView: View {
                                         
                                         if sortedCount == numbersToSort.count - 1 {
                                             withAnimation {
-                                                sortingState = "Sorting Complete"
+                                                sortingState = .completed
                                             }
                                             try? await Task.sleep(for: .seconds(0.5))
                                             allNumbersSorted = true
@@ -163,7 +170,7 @@ struct ContentView: View {
                         
                         Button("Shuffle") {
                             withAnimation {
-                                sortingState = ""
+                                sortingState = .idle
                                 numbersToSort.shuffle()
                                 hapticTrigger.toggle()
                             }
@@ -178,17 +185,17 @@ struct ContentView: View {
                     if !numbersToSort.isEmpty {
                         Button {
                             withAnimation {
-                                if sortingState == "Sorting..." {
+                                if sortingState == .sorting {
                                     allNumbersSorted = true
-                                    sortingState = ""
+                                    sortingState = .idle
                                     return
                                 }
-                                sortingState = ""
+                                sortingState = .idle
                                 numbersToSort.removeAll()
                                 hapticTrigger.toggle()
                             }
                         } label: {
-                            Image(systemName: sortingState == "Sorting..." ? "xmark" : "trash.fill")
+                            Image(systemName: sortingState == .sorting ? "xmark" : "trash.fill")
                                 .imageScale(.small)
                                 .frame(width: 10, height: 20)
                                 .contentTransition(.symbolEffect(.replace))
