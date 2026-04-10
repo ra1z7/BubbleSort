@@ -5,6 +5,8 @@
 //  Created by Purnaman Rai (College) on 29/10/2025.
 //
 
+import AudioToolbox
+// import AVFoundation // For custom .mp3 sound
 import SwiftUI
 
 struct NumBox: View, Identifiable {
@@ -24,6 +26,7 @@ struct NumBox: View, Identifiable {
 
 struct ContentView: View {
     @State private var numbersToSort = [Int]()
+    // @State private var audioPlayer: AVAudioPlayer? // For custom .mp3 sound
     
     enum SortingState: String {
         case sorting = "Sorting..."
@@ -79,6 +82,7 @@ struct ContentView: View {
                                         numbersToSort.append(randomNumber)
                                         hapticTrigger.toggle()
                                     }
+                                    playPop() // Play pop sound when samples are added
                                     break
                                 }
                             }
@@ -145,7 +149,7 @@ struct ContentView: View {
                                                     numbersToSort[i] = numbersToSort[i + 1]
                                                     numbersToSort[i + 1] = temp
                                                 }
-                                                
+                                                playPop() // Play pop sound when swapped
                                                 try? await Task.sleep(for: .seconds(1.1 - sortingSpeed))
                                             }
                                         }
@@ -241,6 +245,17 @@ struct ContentView: View {
                 .transition(.blurReplace)
             }
         }
+    }
+    
+    func playPop() {
+        AudioServicesPlaySystemSound(1104) // Built-in Keyboard Pop Sound
+
+        // Add Custom .mp3 Sound:
+        
+        // guard let url = Bundle.main.url(forResource: "pop", withExtension: "mp3") else { return }
+        // audioPlayer = try? AVAudioPlayer(contentsOf: url)
+        // audioPlayer?.rate = Float(sortingSpeed)
+        // audioPlayer?.play()
     }
 }
 
